@@ -3,36 +3,45 @@ package main
 import (
 	"context"
 	"fmt"
-
 	"github.com/reeegry/flood-control-solve/config"
 	"github.com/reeegry/flood-control-solve/internal/db"
 	"github.com/reeegry/flood-control-solve/internal/floodControl"
+	"log"
+	"math/rand"
 	"time"
 )
+
+func messageSimulate(ctx context.Context, cfg config.Config, c *floodControl.FloodController) {
+	for {
+		ind := rand.Int() % len(cfg.UserIds)
+		for i := 0; i < 3; i++ {
+			if rand.Float64() > 0.5 {
+				ok, err := c.Check(ctx, cfg.UserIds[ind])
+				if err != nil {
+					log.Printf("can't check user %d", cfg.UserIds[ind])
+				}
+				val, err := c.Db.GetVal(ctx, cfg.UserIds[ind])
+				log.Printf("user %d %d messages", cfg.UserIds[ind], val)
+				if !ok {
+					log.Printf("user %d if fludding", cfg.UserIds[ind])
+				}
+			}
+			time.Sleep(time.Second)
+		}
+	}
+}
 
 func main() {
 	cfg, _ := config.Read("../config/config.json")
 	fmt.Println(cfg)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*11)
-	defer cancel()
+	ctx := context.Background()
 
 	rd := db.NewRd(cfg)
 	controller := floodControl.NewController(rd, cfg)
 	fmt.Println(controller)
 
-	for i := 0; i < 25; i++ {
-		ok, err := controller.Check(ctx, 123)
-		if err != nil {
-			fmt.Println("err: ", err)
-		}
-
-		if !ok {
-			fmt.Printf("%d is fluding", 123)
-		}
-
-		time.Sleep(time.Second)
-	}
+	messageSimulate(ctx, cfg, controller)
 
 }
 

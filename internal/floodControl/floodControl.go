@@ -8,39 +8,38 @@ import (
 )
 
 type FloodController struct {
-	db *db.Redis
+	Db *db.Redis
 	N  int
 	K  int
 }
 
 func NewController(rd *db.Redis, cfg config.Config) *FloodController {
 	return &FloodController{
-		db: rd,
-		//N:  cfg.N,
-		K: cfg.K,
+		Db: rd,
+		K:  cfg.K,
 	}
 }
 
 func (f *FloodController) Check(ctx context.Context, userID int64) (bool, error) {
-	InDB, err := f.db.Client.Exists(ctx, strconv.Itoa(int(userID))).Result()
+	InDB, err := f.Db.Client.Exists(ctx, strconv.Itoa(int(userID))).Result()
 	if err != nil {
 		return false, err
 	}
 
 	if InDB == 0 {
-		err := f.db.AddUser(ctx, userID)
+		err := f.Db.AddUser(ctx, userID)
 		if err != nil {
 			return false, err
 		}
 
 	}
 
-	err = f.db.IncrTime(ctx, userID)
+	err = f.Db.IncrTime(ctx, userID)
 	if err != nil {
 		return false, err
 	}
 
-	if cnt, _ := f.db.GetVal(ctx, userID); cnt > f.K {
+	if cnt, _ := f.Db.GetVal(ctx, userID); cnt > f.K {
 		return false, nil
 	}
 

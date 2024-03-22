@@ -10,9 +10,9 @@ type Config struct {
 		Host string `json:"host"`
 		Port int    `json:"port"`
 	}
-	N       int   `json:"N"`
-	K       int   `json:"K"`
-	UserIds []int `json:"UserIds"`
+	N       int     `json:"N"`
+	K       int     `json:"K"`
+	UserIds []int64 `json:"UserIds"`
 }
 
 func Read(filename string) (Config, error) {
