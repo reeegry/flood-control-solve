@@ -8,7 +8,7 @@ docker pull redis
 docker run --name vk-flood-control -p 6379:6379 -d redis
 ```
 ```bash    
-go cd cmd
+cd cmd
 ```
 ```bash    
 go run .
