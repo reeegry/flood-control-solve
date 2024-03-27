@@ -1,5 +1,5 @@
 ```bash   
-git clone https://github.com/MaksimovDenis/floodControl.git
+git clone https://github.com/reeegry/flood-control-solve.git
 ```
 ```bash    
 docker pull redis
